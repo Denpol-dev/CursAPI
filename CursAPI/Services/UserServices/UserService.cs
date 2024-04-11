@@ -5,7 +5,7 @@ namespace CursAPI.Services.UserServices
 {
     public class UserService : IUserService
     {
-        public async Task<bool> AddUsers()
+        public async Task<bool> AddUsers(User u)
         {
             using var context = new Context();
             for (int i = 0; i < 1000; i++)
@@ -31,9 +31,8 @@ namespace CursAPI.Services.UserServices
                 context.Users.Add(user);
                 context.Clients.Add(client);
             }
-            await context.SaveChangesAsync();
-
-            return true;
+            
+            return await context.SaveChangesAsync() > 0;
         }
 
         public async Task<List<User>> GetAllUsers()
