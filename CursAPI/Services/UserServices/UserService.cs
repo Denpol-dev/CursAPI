@@ -1,11 +1,12 @@
 ﻿using CursAPI.Enities;
+using CursAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CursAPI.Services.UserServices
 {
     public class UserService : IUserService
     {
-        public async Task<bool> AddUsers(User u)
+        public async Task<bool> AddUsers()
         {
             using var context = new Context();
             for (int i = 0; i < 1000; i++)
@@ -32,6 +33,25 @@ namespace CursAPI.Services.UserServices
                 context.Clients.Add(client);
             }
             
+            return await context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> AddUser(UserModel userModel)
+        {
+            using var context = new Context();
+
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                Name = userModel.Name,
+                Password = userModel.Password,
+                Email = userModel.Email,
+                Sex = userModel.Sex,
+                BirthDate = userModel.BirthDate
+            };
+
+            context.Users.Add(user);
+
             return await context.SaveChangesAsync() > 0;
         }
 

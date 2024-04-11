@@ -1,4 +1,5 @@
 ﻿using CursAPI.Enities;
+using CursAPI.Models;
 using CursAPI.Services.UserServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,11 +28,19 @@ namespace CursAPI.Controllers
         }
 
         [HttpPost("addusers")]
-        public async Task<IActionResult> AddUsers(User user)
+        public async Task<IActionResult> AddUsers()
+        {
+            _logger.LogInformation("Добавление 1000 пользователей");
+
+            return Ok(await _userService.AddUsers());
+        }
+
+        [HttpPost("adduser")]
+        public async Task<IActionResult> AddUser([FromBody] UserModel user)
         {
             _logger.LogInformation("Добавление пользователя");
 
-            return Ok(await _userService.AddUsers(user));
+            return Ok(await _userService.AddUser(user));
         }
     }
 }
