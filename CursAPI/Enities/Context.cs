@@ -1,15 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace CursAPI.Enities
 {
-    public class Context : DbContext
+    public class Context : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
-        public virtual DbSet<User> Users { get; set; }
-        public virtual DbSet<Client> Clients { get; set; }
-
-        public Context()
+        public Context(DbContextOptions<Context> options) : base(options)
         {
         }
+
+        public virtual DbSet<Client> Clients { get; set; }
+        public virtual DbSet<Book> Books { get; set; }
+        public virtual DbSet<Author> Authors { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

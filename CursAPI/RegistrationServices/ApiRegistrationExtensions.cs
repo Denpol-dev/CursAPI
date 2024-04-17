@@ -1,4 +1,6 @@
-﻿using CursAPI.Services.ClientServices;
+﻿using CursAPI.Enities;
+using CursAPI.Services.ClientServices;
+using CursAPI.Services.Identity;
 using CursAPI.Services.UserServices;
 
 namespace CursAPI.RegistrationServices
@@ -14,6 +16,7 @@ namespace CursAPI.RegistrationServices
         {
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IClientService, ClientService>();
+            services.AddScoped<ITokenService, TokenService>();
 
             return services;
         }

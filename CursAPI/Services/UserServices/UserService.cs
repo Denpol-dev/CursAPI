@@ -1,101 +1,76 @@
 ﻿using CursAPI.Enities;
+using CursAPI.Extensions;
 using CursAPI.Models;
+using CursAPI.Services.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace CursAPI.Services.UserServices
 {
     public class UserService : IUserService
     {
-        public async Task<bool> AddUsers()
-        {
-            using var context = new Context();
-            for (int i = 0; i < 1000; i++)
-            {
-                var user = new User
-                {
-                    Id = Guid.NewGuid(),
-                    Name = GetRandomStr(),
-                    Password = GetRandomStr(),
-                    Email = GetRandomStr(),
-                    Sex = GetRandomInt(0, 1),
-                    BirthDate = GetRandomDate(),
-                };
+        private readonly Context _context;
+        private readonly ITokenService _token;
+        private readonly IConfiguration _configuration;
+        private readonly UserManager<User> _userManager;
 
-                var client = new Client
-                {
-                    ClientId = Guid.NewGuid(),
-                    CountSell = GetRandomInt(0, 500),
-                    CountBuy = GetRandomInt(0, 500),
-                    UserId = user.Id,
-                    User = user
-                };
-                context.Users.Add(user);
-                context.Clients.Add(client);
-            }
-            
-            return await context.SaveChangesAsync() > 0;
+        public UserService(Context context, ITokenService token, IConfiguration configuration, UserManager<User> userManager)
+        {
+            _context = context;
+            _token = token;
+            _configuration = configuration;
+            _userManager = userManager;
         }
 
-        public async Task<bool> AddUser(UserModel userModel)
+        public async Task<User?> GetUserByEmail(string email)
         {
-            using var context = new Context();
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
 
+        public async Task<AuthResponse> Authenticate(User user)
+        {
+            var roleIds = await _context.UserRoles.Where(r => r.UserId == user.Id).Select(x => x.RoleId).ToListAsync();
+            var roles = await _context.Roles.Where(x => roleIds.Contains(x.Id)).ToListAsync();
+
+            var accessToken = _token.CreateToken(user, roles);
+            user.RefreshToken = _configuration.GenerateRefreshToken();
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_configuration.GetSection("Jwt:RefreshTokenValidityInDays").Get<int>());
+
+            await _context.SaveChangesAsync();
+
+            return new AuthResponse
+            {
+                Username = user.UserName!,
+                Email = user.Email!,
+                Token = accessToken,
+                RefreshToken = user.RefreshToken
+            };
+        }
+
+        public async Task<object?> Registration(RegisterRequest request)
+        {
             var user = new User
             {
-                Id = Guid.NewGuid(),
-                Name = userModel.Name,
-                Password = userModel.Password,
-                Email = userModel.Email,
-                Sex = userModel.Sex,
-                BirthDate = userModel.BirthDate
+                Name = request.FirstName + " " + request.LastName + " " + request.MiddleName,
+                Email = request.Email,
+                UserName = request.Email
             };
+            var result = await _userManager.CreateAsync(user, request.Password);
 
-            context.Users.Add(user);
+            if (!result.Succeeded) return null;
 
-            return await context.SaveChangesAsync() > 0;
-        }
+            var findUser = 
+                await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email) 
+                ?? 
+                throw new Exception($"User {request.Email} not found");
 
-        public async Task<List<User>> GetAllUsers()
-        {
-            using var context = new Context();
+            await _userManager.AddToRoleAsync(findUser, RoleConstants.Member);
 
-            return await context.Users
-                .Include(u => u.Clients)
-                .ToListAsync();
-        }
-
-        #region Вспомогательные методы
-
-        private static string GetRandomStr()
-        {
-            int x = GetRandomInt(4, 10);
-
-            string str = "";
-            var r = new Random();
-            while (str.Length < x)
+            return new AuthenticationRequest
             {
-                char c = (char)r.Next(33, 125);
-                if (char.IsLetterOrDigit(c))
-                    str += c;
-            }
-            return str;
+                Email = request.Email,
+                Password = request.Password
+            };
         }
-
-        private static int GetRandomInt(int from, int to)
-        {
-            var dig = new Random();
-            int x = dig.Next(from, to);
-            return x;
-        }
-
-        private static DateTime GetRandomDate()
-        {
-            var gen = new Random();
-            var start = new DateTime(1995, 1, 1);
-            int range = (new DateTime(2006, 1, 1) - start).Days;
-            return start.AddDays(gen.Next(range));
-        }
-
-        #endregion
     }
 }

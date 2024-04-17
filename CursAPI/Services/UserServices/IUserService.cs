@@ -5,8 +5,8 @@ namespace CursAPI.Services.UserServices
 {
     public interface IUserService
     {
-        Task<bool> AddUsers();
-        Task<bool> AddUser(UserModel user);
-        Task<List<User>> GetAllUsers();
+        Task<User?> GetUserByEmail(string email);
+        Task<AuthResponse> Authenticate(User user);
+        Task<object?> Registration(RegisterRequest request);
     }
 }

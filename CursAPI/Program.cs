@@ -1,6 +1,6 @@
 using CursAPI.Middlewares;
-using System.Text.Json.Serialization;
 using CursAPI.RegistrationServices;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +8,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -16,6 +15,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<ILogger>(s => s.GetRequiredService<ILogger<Program>>());
 
 //Наши сервисы
+builder.Services.AddAuth();
 builder.Services.AddServices();
 
 var app = builder.Build();
@@ -29,11 +29,9 @@ if (app.Environment.IsDevelopment())
 
 //Добавляем наш Middleware
 app.UseMiddleware<StartMiddleware>();
-
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
