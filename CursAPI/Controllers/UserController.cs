@@ -2,6 +2,7 @@
 using CursAPI.Extensions;
 using CursAPI.Models;
 using CursAPI.Services.UserServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,18 +16,15 @@ namespace CursAPI.Controllers
     {
         private readonly ILogger _logger;
         private readonly IUserService _userService;
-        private readonly Context _context;
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
-        public UserController(ILogger logger, IUserService userService, Context context, UserManager<User> userManager, IConfiguration configuration)
+        public UserController(ILogger logger, IUserService userService, UserManager<User> userManager, IConfiguration configuration)
         {
             _logger = logger;
             _userService = userService;
-            _context = context;
             _userManager = userManager;
             _configuration = configuration;
         }
-
 
         [HttpPost("login")]
         public async Task<IActionResult> Authenticate([FromBody] AuthenticationRequest request)
