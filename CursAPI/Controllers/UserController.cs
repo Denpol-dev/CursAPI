@@ -2,7 +2,6 @@
 using CursAPI.Extensions;
 using CursAPI.Models;
 using CursAPI.Services.UserServices;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -68,6 +67,8 @@ namespace CursAPI.Controllers
                 return BadRequest(request);
             else if (registrationRequest is AuthenticationRequest ar)
                 return await Authenticate(ar);
+            else if (registrationRequest is string)
+                return BadRequest(registrationRequest);
 
             return BadRequest(request);
         }

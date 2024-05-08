@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace CursAPI.Enities
 {
@@ -12,6 +13,8 @@ namespace CursAPI.Enities
         /// <summary>
         /// Имя пользователя
         /// </summary>
+        [Required]
+        [StringLength(100)]
         public string Name { get; set; }
         public int Sex { get; set; }
         public DateTime? BirthDate { get; set; }

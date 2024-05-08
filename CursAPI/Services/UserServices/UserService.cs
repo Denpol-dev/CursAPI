@@ -57,7 +57,7 @@ namespace CursAPI.Services.UserServices
             };
             var result = await _userManager.CreateAsync(user, request.Password);
 
-            if (!result.Succeeded) return null;
+            if (!result.Succeeded) return "Неудачная регистрация";
 
             var findUser = 
                 await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email) 

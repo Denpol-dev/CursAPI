@@ -1,7 +1,6 @@
 ﻿using CursAPI.Enities;
 using CursAPI.Extensions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace CursAPI.Services.Identity

@@ -11,12 +11,11 @@ namespace CursAPI.Controllers
             _logger = logger;
         }
 
-        //[HttpGet("allusers")]
-        //public async Task<IActionResult> GetAllUser()
-        //{
-        //    _logger.LogInformation("Получение всех пользователей.");
-
-        //    return Ok(await _userService.GetAllUsers());
-        //}
+        [HttpGet("books")]
+        public async Task<IActionResult> GetBook()
+        {
+            _logger.LogInformation("Работает");
+            return Ok("Работает");
+        }
     }
 }

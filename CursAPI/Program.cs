@@ -1,4 +1,5 @@
 using CursAPI.Middlewares;
+using CursAPI.Models;
 using CursAPI.RegistrationServices;
 using System.Text.Json.Serialization;
 
@@ -33,5 +34,8 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+app.UseRouting();
+app.Map("/user", () => new UserModel { Name = "1231" });
 
 app.Run();
