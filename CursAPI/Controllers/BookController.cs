@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CursAPI.Controllers
 {
@@ -12,6 +13,7 @@ namespace CursAPI.Controllers
         }
 
         [HttpGet("books")]
+        [Authorize]
         public async Task<IActionResult> GetBook()
         {
             _logger.LogInformation("Работает");
