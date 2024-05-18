@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using CursAPI.Web;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace CursAPI.Controllers
 {
@@ -12,7 +14,13 @@ namespace CursAPI.Controllers
             _logger = logger;
         }
 
-        [HttpGet("books")]
+        /// <summary>
+        /// Получение всех книг
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route(Routes.AllBooks)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [Authorize]
         public async Task<IActionResult> GetBook()
         {
